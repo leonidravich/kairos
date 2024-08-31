@@ -123,6 +123,7 @@ graph_index = 0
 for c in communities:
     dot = Digraph(name="MyPicture", comment="the test", format="pdf")
     dot.graph_attr['rankdir'] = 'LR'
+    graphml_graph = nx.DiGraph()
 
     for e in communities[c].edges:
         try:
@@ -144,7 +145,8 @@ for c in communities:
                 src_node_color = 'red'
             else:
                 src_node_color = 'blue'
-            dot.node(name=str(hashgen(replace_path_name(temp_edge['srcmsg']))), label=str(
+            src_name= str(hashgen(replace_path_name(temp_edge['srcmsg'])))
+            dot.node(name=src_name, label=str(
                 replace_path_name(temp_edge['srcmsg']) + str(
                     partition[str(hashgen(replace_path_name(temp_edge['srcmsg'])))])), color=src_node_color,
                      shape=src_shape)
@@ -160,7 +162,8 @@ for c in communities:
                 dst_node_color = 'red'
             else:
                 dst_node_color = 'blue'
-            dot.node(name=str(hashgen(replace_path_name(temp_edge['dstmsg']))), label=str(
+            dst_name=str(hashgen(replace_path_name(temp_edge['dstmsg'])))
+            dot.node(name=dst_name, label=str(
                 replace_path_name(temp_edge['dstmsg']) + str(
                     partition[str(hashgen(replace_path_name(temp_edge['dstmsg'])))])), color=dst_node_color,
                      shape=dst_shape)
@@ -173,7 +176,16 @@ for c in communities:
                      str(hashgen(replace_path_name(temp_edge['dstmsg']))), label=temp_edge['edge_type'],
                      color=edge_color)
 
+       
+
+            # Add nodes and edge to the NetworkX graph
+            graphml_graph.add_node(src_name, label=replace_path_name(temp_edge['srcmsg']), color=src_node_color, shape=src_shape)
+            graphml_graph.add_node(dst_name, label=replace_path_name(temp_edge['dstmsg']), color=dst_node_color, shape=dst_shape)
+            graphml_graph.add_edge(src_name, dst_name, label=temp_edge['edge_type'], color=edge_color)
+
     dot.render(f'{artifact_dir}/graph_visual/subgraph_' + str(graph_index), view=False)
+    nx.write_graphml(graphml_graph, f'{artifact_dir}/graph_visual/subgraph_' + str(graph_index) + '.graphml')
+
     graph_index += 1
 
 
