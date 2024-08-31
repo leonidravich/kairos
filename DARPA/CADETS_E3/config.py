@@ -5,7 +5,7 @@
 ########################################################
 
 # The directory of the raw logs
-raw_dir = "/the/absolute/path/of/cadets_e3/"
+raw_dir = "/home/ravich/darpa_cadets_e3/"
 
 # The directory to save all artifacts
 artifact_dir = "./artifact/"
@@ -36,17 +36,17 @@ database = 'tc_cadet_dataset_db'
 # Only config this setting when you have the problem mentioned
 # in the Troubleshooting section in settings/environment-settings.md.
 # Otherwise, set it as None
-host = '/var/run/postgresql/'
+host = 'localhost'
 # host = None
 
 # Database user
-user = 'postgres'
+user = 'ravich'
 
 # The password to the database user
-password = 'postgres'
+password = ''
 
 # The port number for Postgres
-port = '5432'
+port = ''
 
 
 ########################################################
