@@ -4,6 +4,8 @@
 ##########################################################################################
 
 import logging
+import time
+import torch
 
 from kairos_utils import *
 from config import *
@@ -106,6 +108,14 @@ def init_models(node_feat_size):
 if __name__ == "__main__":
     logger.info("Start logging.")
 
+    start_time = time.time()
+    cpu_start_time = time.process_time()
+
+    if torch.cuda.is_available():
+        gpu_start = torch.cuda.Event(enable_timing=True)
+        gpu_end = torch.cuda.Event(enable_timing=True)
+        gpu_start.record()
+
     # Load data for training
     train_data = load_train_data()
 
@@ -125,6 +135,26 @@ if __name__ == "__main__":
                 neighbor_loader=neighbor_loader
             )
             logger.info(f'  Epoch: {epoch:02d}, Loss: {loss:.4f}')
+
+    # End time measurement
+    end_time = time.time()
+    cpu_end_time = time.process_time()
+
+    if torch.cuda.is_available():
+        gpu_end.record()
+        torch.cuda.synchronize()  # Wait for the events to be recorded
+        gpu_time = gpu_start.elapsed_time(gpu_end) / 1000  # Convert milliseconds to seconds
+    else:
+        gpu_time = None
+
+    total_time = end_time - start_time
+    cpu_time = cpu_end_time - cpu_start_time
+
+    # Log the time statistics
+    logger.info(f"Total Training Time: {total_time:.2f} seconds (Real Time)")
+    logger.info(f"CPU Time Used: {cpu_time:.2f} seconds")
+    if gpu_time is not None:
+        logger.info(f"GPU Time Used: {gpu_time:.2f} seconds")
 
     # Save the trained model
     model = [memory, gnn, link_pred, neighbor_loader]
